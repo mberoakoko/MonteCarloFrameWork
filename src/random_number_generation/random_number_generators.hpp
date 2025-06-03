@@ -14,9 +14,8 @@ namespace RandomNumber {
         virtual auto get_uniform_value() const -> double = 0;
         [[nodiscard]]
         auto get_uniform_vector(std::size_t N) const -> std::vector<double> {
-            std::vector<double> result;
-            result.reserve(N);
-            std::fill(result.begin(), result.end(), [this]() {
+            std::vector<double> result(N);
+            std::ranges::generate(result,  [this]()mutable {
                 return get_uniform_value();
             });
             return result;
@@ -26,12 +25,11 @@ namespace RandomNumber {
     class INormalGenerator {
     public:
         virtual ~INormalGenerator() = default;
-        virtual auto get_normal_value() const -> double = 0;
+        virtual auto get_normal_value() -> double = 0;
         [[nodiscard]]
-        auto get_normal_vector(std::size_t N) const -> std::vector<double> {
-            std::vector<double> result;
-            result.reserve(N);
-            std::fill(result.begin(), result.end(), [this] {
+        auto get_normal_vector(std::size_t N) -> std::vector<double> {
+            std::vector<double> result(N);;
+            std::ranges::generate(result.begin(), result.end(), [this] {
                 return get_normal_value();
             });
             return result;
@@ -62,12 +60,12 @@ namespace RandomNumber {
         explicit BoxMullerGenerator(const std::unique_ptr<IUniformGenerator>& normal_generator)
         : INormalGenerator() {
             generator_.reset();
-            // generator_ = normal_generator;
+            generator_ = std::make_unique<UniformGenerator>(normal_generator->get_uniform_value());
         };
 
-        ~BoxMullerGenerator() override;
+        ~BoxMullerGenerator() override {};
 
-        auto get_normal_value() -> double  {
+        auto get_normal_value()  -> double override  {
             u_1 = generator_->get_uniform_value();
             u_2 = generator_->get_uniform_value();
             double w = ::sqrt(- 2 * ::log(u_1));
