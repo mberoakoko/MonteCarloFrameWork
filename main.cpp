@@ -2,6 +2,7 @@
 #include <coroutine>
 #include "src/random_number_generation/random_number_generators.hpp"
 #include "src/sims/one_factor_monte_carlo.hpp"
+#include "src/random_number_generation/distributions.hpp"
 
 namespace ExactSDE {
     // Known solution accordin to ito's lemma
@@ -10,8 +11,8 @@ namespace ExactSDE {
     // b |-> diffusion coeffient
     double a,  b;
     static OneFactorMonteCarlo::SDETypeD::SDETypeDParams params{
-        .drift_func = [](double t, double x) -> double      {return a * x;},
-        .diffusion_func = [](double t, double x) -> double  {return b * x;}
+        .drift_func = [](double t, const double x) -> double      {return a * x;},
+        .diffusion_func = [](double t, const double x) -> double  {return b * x;}
     };
 }
 
@@ -34,6 +35,12 @@ int main() {
     OneFactorMonteCarlo::SDETypeD sde(params, sde_type_d_params);
     std::cout<< sde.calculate_diffusion(1, 100) << std::endl;
     std::cout<< sde.calculate_drift(1, 100) << std::endl;
+    Distributions::UniformDistribution uniform_distribution(100);
+    std::cout<< uniform_distribution.sample() << std::endl;
+    uniform_distribution.sample_n(100);
+    std::cout << "Calculated Expectation Value "
+        << uniform_distribution.expectation([](float input_number) -> double { return input_number; })
+        << std::endl;
 
     return 0;
 }

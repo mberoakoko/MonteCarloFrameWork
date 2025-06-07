@@ -111,7 +111,7 @@ namespace OneFactorMonteCarlo {
         std::vector<double> d_W;
     };
 
-    class ExplicitEuler final: FiniteDifferenceMethodsVisitor {
+    /*class ExplicitEuler final: FiniteDifferenceMethodsVisitor {
     public:
         explicit ExplicitEuler() = default;
         explicit ExplicitEuler(const std::size_t& N , const double dt,const double initial_value )
@@ -126,7 +126,7 @@ namespace OneFactorMonteCarlo {
             }(1);
         };
 
-    };
+    };*/
 
 }
 #endif //ONE_FACTOR_MONTE_CARLO_HPP
