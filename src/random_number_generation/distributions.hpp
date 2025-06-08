@@ -71,5 +71,88 @@ namespace Distributions {
                 .expectation_samples = expectation_samples
         }) {}
     };
+
+    class PoissonDistribution final : public SampledDistribution<float, unsigned int> {
+    public:
+        explicit PoissonDistribution(const double lambda , const std::uint64_t& expectation_samples)
+            : SampledDistribution<float, unsigned>({
+                .sampler = [lam = lambda]() {
+                    std::random_device rd;
+                    std::mt19937 gen(rd());
+                    // std::cout<< "Lambda "<< lambda << std::endl;
+                    std::poisson_distribution<> distrib(lam);
+                    return distrib(gen);
+                },
+                .expectation_samples = expectation_samples
+            }), lambda_(lambda) {}
+    private:
+        double lambda_;
+    };
+
+    class GaussianDistribution final : public SampledDistribution<float, unsigned int> {
+    public:
+        struct DistParams {
+            double mu;
+            double sigma;
+            std::size_t expectation_samples = 1000;
+        };
+        explicit GaussianDistribution(const double& mu , const double& sigma, const std::uint64_t& expectation_samples)
+            : SampledDistribution<float, unsigned>({
+                .sampler = [mu, sigma]() {
+                    std::random_device rd;
+                    std::mt19937 gen(rd());
+                    std::normal_distribution<> distrib(mu, sigma);
+                    return distrib(gen);
+                },
+                .expectation_samples = expectation_samples
+            }), mu_(mu), sigma_(sigma){};
+
+        explicit GaussianDistribution(const DistParams& params):GaussianDistribution(params.mu, params.sigma, params.expectation_samples){}
+
+        auto get_mu() const ->  double { return mu_; }
+        auto get_sigma() const -> double { return sigma_; }
+    private:
+        double mu_;
+        double sigma_;
+    };
+    class GammaDistribution final : public SampledDistribution<float, unsigned int> {
+    public:
+        GammaDistribution(const double& alpha , const double& beta, const std::uint64_t& expectation_samples)
+            :SampledDistribution<float, unsigned>({
+                .sampler = [alpha, beta]() {
+                    std::random_device rd;
+                    std::mt19937 gen(rd());
+                    std::gamma_distribution<> distrib(alpha, beta);
+                    return distrib(gen);
+                },
+                .expectation_samples = expectation_samples
+            }), alpha_(alpha), beta_(beta) {}
+
+        auto get_alpha() const ->  double { return alpha_; }
+        auto get_beta() const ->  double { return beta_; }
+
+    private:
+        double alpha_;
+        double beta_;
+    };
+
+    class BetaDistribution final : public SampledDistribution<float, unsigned int> {
+    public:
+        explicit BetaDistribution(const double& alpha, const double& beta, const std::uint64_t& expectation_samples)
+            : SampledDistribution<float, unsigned>({
+                .sampler = [alpha, beta, expectation_samples]()-> double {
+                    GammaDistribution x_dist(alpha, 1, expectation_samples);
+                    GammaDistribution y_dist(beta, 1, expectation_samples);
+                    double x = x_dist.sample();
+                    double y = y_dist.sample();
+                    return x / (x + y);
+                },
+                .expectation_samples = expectation_samples
+            }), beta_(beta), alpha_(alpha) {}
+    private:
+        double alpha_;
+        double beta_;
+    };
+
 }
 #endif //DISTRIBUTIONS_HPP
