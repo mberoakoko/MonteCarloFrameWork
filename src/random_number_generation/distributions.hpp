@@ -109,7 +109,10 @@ namespace Distributions {
 
         explicit GaussianDistribution(const DistParams& params):GaussianDistribution(params.mu, params.sigma, params.expectation_samples){}
 
+        [[nodiscard]]
         auto get_mu() const ->  double { return mu_; }
+
+        [[nodiscard]]
         auto get_sigma() const -> double { return sigma_; }
     private:
         double mu_;
@@ -128,7 +131,11 @@ namespace Distributions {
                 .expectation_samples = expectation_samples
             }), alpha_(alpha), beta_(beta) {}
 
+
+        [[nodiscard]]
         auto get_alpha() const ->  double { return alpha_; }
+
+        [[nodiscard]]
         auto get_beta() const ->  double { return beta_; }
 
     private:
