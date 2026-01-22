@@ -92,8 +92,8 @@ namespace Distributions {
     class GaussianDistribution final : public SampledDistribution<float, unsigned int> {
     public:
         struct DistParams {
-            double mu;
-            double sigma;
+            double mu{};
+            double sigma{};
             std::size_t expectation_samples = 1000;
         };
         explicit GaussianDistribution(const double& mu , const double& sigma, const std::uint64_t& expectation_samples)
